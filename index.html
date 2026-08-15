@@ -4,33 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The Regency Gala - Voting Portal</title>
-    <!-- Professional Browser Tab Icon (Favicon) -->
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3176/3176144.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            /* Updated Background Image */
             background-image: url('IMG-20260814-WA0019.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             background-color: #000;
         }
-        /* Custom scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #ca8a04; border-radius: 10px; }
         
-        /* Floating Animation for the Trophy */
         @keyframes float {
             0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); filter: drop-shadow(0 0 25px rgba(202, 138, 4, 0.9)); }
+            50% { transform: translateY(-20px); filter: drop-shadow(0 0 35px rgba(202, 138, 4, 1)); }
             100% { transform: translateY(0px); }
         }
         .floating-award {
             animation: float 4s ease-in-out infinite;
         }
 
-        /* Energetic Pop-up Animation */
         @keyframes popIn {
             0% { transform: scale(0.8) translateY(30px); opacity: 0; }
             80% { transform: scale(1.05) translateY(-5px); opacity: 1; }
@@ -40,7 +35,6 @@
             animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
-        /* Pulse Animation for the Submit Button */
         @keyframes pulseGlow {
             0% { box-shadow: 0 0 10px rgba(202, 138, 4, 0.5); transform: scale(1); }
             50% { box-shadow: 0 0 25px rgba(202, 138, 4, 1); transform: scale(1.02); }
@@ -51,10 +45,11 @@
         }
     </style>
 </head>
-<body class="min-h-screen text-white bg-black/85 bg-blend-overlay flex flex-col items-center relative overflow-x-hidden font-sans">
+<!-- Adjusted background overlay to bg-black/60 for image visibility -->
+<body class="min-h-screen text-white bg-black/60 flex flex-col items-center relative overflow-x-hidden font-sans">
 
-    <!-- FLOATING ENERGETIC AWARD -->
-    <img src="https://cdn-icons-png.flaticon.com/512/3176/3176144.png" alt="Golden Award" class="floating-award fixed right-[-30px] md:right-[20px] top-[5%] md:top-[10%] w-32 md:w-56 lg:w-72 opacity-30 md:opacity-60 pointer-events-none z-0 sepia-[.5] hue-rotate-[-30deg] saturate-[2]">
+    <!-- REPLACED BROKEN IMAGE WITH FAIL-PROOF GLOWING CSS GRAPHIC -->
+    <div class="floating-award fixed right-[-20px] md:right-[40px] top-[10%] md:top-[15%] text-8xl md:text-[15rem] pointer-events-none z-0 opacity-60 drop-shadow-[0_0_30px_rgba(202,138,4,0.9)]" style="filter: sepia(0.4) saturate(2.5) hue-rotate(-10deg);">🏆</div>
 
     <!-- MAIN VOTING SECTION -->
     <div id="voting-section" class="w-full max-w-7xl px-4 md:px-8 z-10 pb-32 relative">
@@ -180,7 +175,18 @@
             "Clique of the Year": ["THE BOYS", "Jadesola, Olamide, Alice", "Mojoyinoluwa and Dorcas", "Moyin and Eniola", "Tina and Princess", "ATE", "Enkay and Ese", "Sophie, Enny, Faith", "Ore and Dene (ADE)", "Precious Taiwo, Opeyemi and Ahliya"],
             "Socialite of the Year (Male)": ["Bundle", "Obi Osowoaken Lifted", "Akinola Emmanuel", "Adebisi Toheeb Adebayo", "Delight", "Amor", "Opeyemi Maxwell", "Mehn", "Muoghalu Raphael", "OLUWABI DAMILOLA PETER"],
             "Socialite of the Year (Female)": ["Badaru Adijatu Kuburat", "Simsi Haastrup", "Ogunade Mojoyinoluwa", "Iteoluwakinshi Said", "Makinde Ayomide Alice", "Elizabeth Oladele", "Afolabi Fiyinfoluwa Rachel", "Agu Njideka Sophia", "Adebajo Serah", "Anyanwu Josephine Chisom"],
-            "NUESA EXCO of the Year": ["AWONIYI SODIQ OPEYEMI ( Sport Secretary)", "JOEL CHIZARAM OPARA (President)", "Adewuyi Azeemah (Vice president)", "Adedayo Toyosi (Social Secretary)", "Adegbuyi Olumide Peter"]
+            "NUESA EXCO of the Year": [
+                "AWONIYI SODIQ OPEYEMI (Sport Secretary)", 
+                "JOEL CHIZARAM OPARA (President)", 
+                "Adewuyi Azeemah (Vice president)", 
+                "Adedayo Toyosi (Social Secretary)", 
+                "IBITOMI VICTOR OLUWASHINA (Public Relations Officer)",
+                "Adegbuyi peter olumide (Welfare Secretary)",
+                "Adepoju Adefunmi Valentina (Gen Sec)",
+                "Enwere-Nwayo Angel (AGS)",
+                "Aderinale Zainab Temitope (Fin Sec)",
+                "Atanda Azeez (Treasurer)"
+            ]
         };
 
         let votes = {};
@@ -206,7 +212,7 @@
                 });
 
                 const card = document.createElement('div');
-                card.className = "border border-gray-800 p-4 md:p-5 rounded-xl bg-black/60 backdrop-blur-sm hover:border-yellow-500 hover:bg-black/80 transition-all duration-300 shadow-lg group";
+                card.className = "border border-gray-800 p-4 md:p-5 rounded-xl bg-black/70 backdrop-blur-sm hover:border-yellow-500 hover:bg-black/90 transition-all duration-300 shadow-lg group";
                 card.innerHTML = `
                     <div class="flex items-center mb-3">
                         <span class="bg-yellow-600/20 text-yellow-500 font-bold w-6 h-6 md:w-8 md:h-8 flex items-center justify-center rounded-full mr-2 text-xs md:text-sm group-hover:bg-yellow-500 group-hover:text-black transition-colors">${idx + 1}</span>
