@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - The Regency Gala</title>
-    <!-- Professional Browser Tab Icon using your image -->
     <link rel="icon" href="IMG-20260814-WA0019.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js Integration for Live Bar Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { background-color: #0a0a0a; color: #fff; font-family: 'Inter', sans-serif; }
         ::-webkit-scrollbar { width: 8px; }
@@ -40,12 +41,15 @@
             <p class="text-xs text-gray-500 mt-1 uppercase tracking-widest">NUESA Admin Panel</p>
         </div>
         
-        <nav class="flex-1 p-4 space-y-2">
+        <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
             <button class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg bg-yellow-600/10 text-yellow-500 border border-yellow-500/50 transition-colors" data-target="dashboard">
                 <span>📊</span> <span>Dashboard</span>
             </button>
             <button class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors" data-target="results">
-                <span>🏆</span> <span>Live Results</span>
+                <span>📈</span> <span>Live Results</span>
+            </button>
+            <button class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors" data-target="audit">
+                <span>🗑️</span> <span>Audit Votes</span>
             </button>
             <button class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors" data-target="categories">
                 <span>📂</span> <span>Categories (30)</span>
@@ -63,7 +67,8 @@
     <!-- MOBILE NAV (Bottom Bar) -->
     <div class="md:hidden fixed bottom-0 w-full bg-gray-900 border-t border-gray-800 flex justify-around p-3 z-40 pb-6">
         <button class="nav-btn text-yellow-500 flex flex-col items-center" data-target="dashboard"><span class="text-xl">📊</span><span class="text-[10px]">Home</span></button>
-        <button class="nav-btn text-gray-400 flex flex-col items-center" data-target="results"><span class="text-xl">🏆</span><span class="text-[10px]">Results</span></button>
+        <button class="nav-btn text-gray-400 flex flex-col items-center" data-target="results"><span class="text-xl">📈</span><span class="text-[10px]">Results</span></button>
+        <button class="nav-btn text-gray-400 flex flex-col items-center" data-target="audit"><span class="text-xl">🗑️</span><span class="text-[10px]">Audit</span></button>
         <button class="nav-btn text-gray-400 flex flex-col items-center" data-target="settings"><span class="text-xl">⚙️</span><span class="text-[10px]">Settings</span></button>
     </div>
 
@@ -83,7 +88,7 @@
                         <h1 class="text-3xl md:text-4xl font-serif text-white font-bold">System Overview</h1>
                         <p class="text-gray-400 mt-1">Real-time statistics and database health.</p>
                     </div>
-                    <button id="refresh-data-btn" class="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded-lg border border-gray-600 transition-colors hidden md:block">
+                    <button class="refresh-data-btn bg-gray-800 hover:bg-gray-700 text-white p-2 rounded-lg border border-gray-600 transition-colors hidden md:block">
                         🔄 Refresh Data
                     </button>
                 </div>
@@ -105,21 +110,19 @@
                         <p class="text-xl font-bold mt-4 text-red-400">August 28, 2026</p>
                     </div>
                 </div>
-
-                <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow-lg">
-                    <div class="p-5 border-b border-gray-800 flex justify-between items-center">
-                        <h2 class="text-lg font-bold text-white">Recent Activity Log</h2>
-                    </div>
-                    <div class="p-8 text-center text-gray-500 text-sm">
-                        Database connection established. Awaiting incoming votes...
-                    </div>
-                </div>
             </div>
 
-            <!-- VIEW 2: LIVE RESULTS -->
+            <!-- VIEW 2: LIVE RESULTS (WITH CHART) -->
             <div id="results" class="tab-content">
-                <h1 class="text-3xl md:text-4xl font-serif text-white font-bold mb-2">Live Analytics</h1>
-                <p class="text-gray-400 mb-8">Select a category to view the real-time vote tally.</p>
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <h1 class="text-3xl md:text-4xl font-serif text-white font-bold mb-2">Live Analytics</h1>
+                        <p class="text-gray-400">Select a category to view the real-time vote chart and tally.</p>
+                    </div>
+                    <button class="refresh-data-btn bg-gray-800 hover:bg-gray-700 text-white p-2 rounded-lg border border-gray-600 transition-colors hidden md:block">
+                        🔄 Sync
+                    </button>
+                </div>
 
                 <div class="bg-gray-900 rounded-2xl border border-gray-800 p-6 shadow-lg mb-8">
                     <label class="block text-sm font-bold text-yellow-500 uppercase tracking-wider mb-2">Filter by Category</label>
@@ -129,6 +132,12 @@
                     </select>
                 </div>
 
+                <!-- LIVE BAR CHART CONTAINER -->
+                <div class="bg-gray-900 rounded-2xl border border-gray-800 p-6 shadow-lg mb-8 hidden" id="chart-container">
+                    <canvas id="voteChart" height="100"></canvas>
+                </div>
+
+                <!-- RESULTS TABLE -->
                 <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow-lg">
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -147,29 +156,64 @@
                 </div>
             </div>
 
-            <!-- VIEW 3: CATEGORIES & NOMINEES -->
+            <!-- VIEW 3: AUDIT & VOID VOTES -->
+            <div id="audit" class="tab-content">
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <h1 class="text-3xl md:text-4xl font-serif text-white font-bold mb-2">Audit Logs</h1>
+                        <p class="text-red-400 font-bold text-sm bg-red-900/20 inline-block p-2 rounded border border-red-900/50">⚠️ DANGER ZONE: Voiding a vote is permanent.</p>
+                    </div>
+                    <button class="refresh-data-btn bg-gray-800 hover:bg-gray-700 text-white p-2 rounded-lg border border-gray-600 transition-colors hidden md:block">
+                        🔄 Sync
+                    </button>
+                </div>
+
+                <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow-lg">
+                    <div class="p-4 bg-black/50 border-b border-gray-800">
+                        <input type="text" id="search-audit" placeholder="Search by Matric Number..." class="w-full p-3 bg-black border border-gray-700 rounded-lg text-white focus:border-yellow-500 outline-none">
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[600px]">
+                            <thead>
+                                <tr class="bg-black/80 text-gray-400 text-xs uppercase tracking-wider">
+                                    <th class="p-4 border-b border-gray-800">Matriculation No.</th>
+                                    <th class="p-4 border-b border-gray-800">Email Address</th>
+                                    <th class="p-4 border-b border-gray-800">Timestamp</th>
+                                    <th class="p-4 border-b border-gray-800 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="audit-table-body">
+                                <tr>
+                                    <td colspan="4" class="p-8 text-center text-gray-500">Loading audit data...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 4: CATEGORIES & NOMINEES -->
             <div id="categories" class="tab-content">
                 <h1 class="text-3xl md:text-4xl font-serif text-white font-bold mb-2">Database Management</h1>
                 <p class="text-gray-400 mb-8">View the structured schema for the 30 active categories.</p>
-                
                 <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow-lg">
                     <div class="p-5 border-b border-gray-800 bg-black/30">
                         <h2 class="font-bold text-yellow-500">Active Database Clusters (30/30)</h2>
                     </div>
                     <div class="p-6">
-                        <p class="text-sm text-gray-400 mb-4">Nominee data is currently hardcoded into the frontend application matrix to ensure zero-latency loading. To add or remove nominees, update the `NOMINEES` constant in the index file.</p>
+                        <p class="text-sm text-gray-400 mb-4">Nominee data is integrated directly to ensure zero-latency loading on mobile networks.</p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                            <div class="p-3 border border-gray-700 rounded bg-black text-gray-300">✓ Fresher of the Year (M/F) Configured</div>
-                            <div class="p-3 border border-gray-700 rounded bg-black text-gray-300">✓ Sophomore of the Year (M/F) Configured</div>
-                            <div class="p-3 border border-gray-700 rounded bg-black text-gray-300">✓ Penultimate of the Year (M/F) Configured</div>
-                            <div class="p-3 border border-gray-700 rounded bg-black text-gray-300">✓ Finalist of the Year (M/F) Configured</div>
+                            <div class="p-3 border border-gray-700 rounded bg-black text-gray-300">✓ Fresher of the Year (M/F)</div>
+                            <div class="p-3 border border-gray-700 rounded bg-black text-gray-300">✓ Sophomore of the Year (M/F)</div>
+                            <div class="p-3 border border-gray-700 rounded bg-black text-gray-300">✓ Penultimate of the Year (M/F)</div>
+                            <div class="p-3 border border-gray-700 rounded bg-black text-gray-300">✓ Finalist of the Year (M/F)</div>
                             <div class="p-3 border border-gray-700 rounded bg-black text-gray-300 text-yellow-500/80">...and 22 additional categories locked.</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- VIEW 4: SYSTEM SETTINGS -->
+            <!-- VIEW 5: SYSTEM SETTINGS -->
             <div id="settings" class="tab-content">
                 <h1 class="text-3xl md:text-4xl font-serif text-white font-bold mb-2">Security & Settings</h1>
                 <p class="text-gray-400 mb-8">System rules and validation configurations.</p>
@@ -183,38 +227,15 @@
                         </div>
                         <div class="w-12 h-6 bg-yellow-600 rounded-full relative"><div class="w-4 h-4 bg-white rounded-full absolute right-1 top-1"></div></div>
                     </div>
-                    <div class="flex items-center justify-between py-3">
-                        <div>
-                            <p class="font-bold text-gray-200">Strict Submissions (30/30)</p>
-                            <p class="text-xs text-gray-500">Requires voters to complete all categories before submit.</p>
-                        </div>
-                        <div class="w-12 h-6 bg-yellow-600 rounded-full relative"><div class="w-4 h-4 bg-white rounded-full absolute right-1 top-1"></div></div>
-                    </div>
-                </div>
-
-                <div class="bg-gray-900 rounded-2xl border border-gray-800 p-6 shadow-lg">
-                    <h2 class="text-xl text-white font-bold mb-4 border-b border-gray-800 pb-2">Approved Department Codes</h2>
-                    <p class="text-sm text-gray-400 mb-3">Voters must have one of these codes in their matric string to access the portal:</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-1 bg-black border border-gray-700 rounded text-xs text-gray-300">AESA: 0317, 0309, 0306, 0304, 0308, 0303</span>
-                        <span class="px-3 py-1 bg-black border border-gray-700 rounded text-xs text-gray-300">NAAES: 0301</span>
-                        <span class="px-3 py-1 bg-black border border-gray-700 rounded text-xs text-gray-300">ULSESA: 0310</span>
-                        <span class="px-3 py-1 bg-black border border-gray-700 rounded text-xs text-gray-300">SSESA: 0323, 0318, 0312</span>
-                        <span class="px-3 py-1 bg-black border border-gray-700 rounded text-xs text-gray-300">TVESA: 0319, 0320, 0321</span>
-                        <span class="px-3 py-1 bg-black border border-gray-700 rounded text-xs text-gray-300">EFSA: 0305, 0324</span>
-                        <span class="px-3 py-1 bg-black border border-gray-700 rounded text-xs text-gray-300">EMSA: 0302</span>
-                        <span class="px-3 py-1 bg-black border border-gray-700 rounded text-xs text-gray-300">NAPHER-SD: 0314</span>
-                    </div>
                 </div>
             </div>
-
         </div>
     </main>
 
     <!-- FIREBASE & LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAc51FKciWFcwuebOGX91it0NYHgOdbKdQ",
@@ -229,7 +250,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // State Variables
         let allVotes = [];
+        let barChartInstance = null;
         const CATEGORIES = [
             "Fresher of the Year (Male)", "Fresher of the Year (Female)", "Sophomore of the Year (Male)", "Sophomore of the Year (Female)", 
             "Penultimate of the Year (Male)", "Penultimate of the Year (Female)", "Finalist of the Year (Male)", "Finalist of the Year (Female)", 
@@ -240,6 +263,7 @@
             "Brand of the Year", "Entrepreneur of the Year", "Clique of the Year", "Socialite of the Year (Male)", "Socialite of the Year (Female)", "NUESA EXCO of the Year"
         ];
 
+        // --- AUTHENTICATION LOGIC ---
         const loginScreen = document.getElementById('admin-login');
         const unlockBtn = document.getElementById('unlock-btn');
         const passwordInput = document.getElementById('admin-password');
@@ -255,6 +279,7 @@
             }
         });
 
+        // --- NAVIGATION LOGIC ---
         const navBtns = document.querySelectorAll('.nav-btn');
         const tabContents = document.querySelectorAll('.tab-content');
 
@@ -284,11 +309,15 @@
             window.location.reload();
         });
 
+        // --- DATABASE LOGIC ---
         const loadingOverlay = document.getElementById('loading-overlay');
         const categoryFilter = document.getElementById('category-filter');
         const resultsTableBody = document.getElementById('results-table-body');
         const totalVotesStat = document.getElementById('total-votes-stat');
+        const auditTableBody = document.getElementById('audit-table-body');
+        const searchAudit = document.getElementById('search-audit');
 
+        // Populate Category Dropdown
         CATEGORIES.forEach(cat => {
             const option = document.createElement('option');
             option.value = cat;
@@ -302,7 +331,8 @@
                 const querySnapshot = await getDocs(collection(db, "votes"));
                 allVotes = [];
                 querySnapshot.forEach((doc) => {
-                    allVotes.push(doc.data());
+                    // Store the document ID so we can delete it later
+                    allVotes.push({ docId: doc.id, ...doc.data() });
                 });
                 
                 totalVotesStat.innerText = allVotes.length;
@@ -310,20 +340,25 @@
                 if (categoryFilter.value) {
                     renderResults(categoryFilter.value);
                 }
+                
+                renderAuditTable();
 
             } catch (error) {
                 console.error("Error fetching data: ", error);
-                alert("Failed to sync with Firebase. Check your configuration keys and internet connection.");
+                alert("Failed to sync with Firebase. Check your network.");
             } finally {
                 loadingOverlay.classList.add('hidden');
             }
         }
 
+        // --- RENDER LIVE RESULTS & BAR CHART ---
         function renderResults(categoryName) {
+            document.getElementById('chart-container').classList.remove('hidden');
             const tallies = {};
             
+            // Count Votes
             allVotes.forEach(voteDoc => {
-                const selection = voteDoc.selections[categoryName];
+                const selection = voteDoc.selections ? voteDoc.selections[categoryName] : null;
                 if (selection) {
                     tallies[selection] = (tallies[selection] || 0) + 1;
                 }
@@ -334,14 +369,22 @@
                 count: tallies[nominee]
             })).sort((a, b) => b.count - a.count);
 
+            // 1. Render Table
             resultsTableBody.innerHTML = '';
-            
             if (sortedResults.length === 0) {
                 resultsTableBody.innerHTML = '<tr><td colspan="3" class="p-8 text-center text-gray-500">No votes recorded for this category yet.</td></tr>';
+                renderChart([], []);
                 return;
             }
 
+            const chartLabels = [];
+            const chartData = [];
+
             sortedResults.forEach((result, index) => {
+                // Populate arrays for the chart
+                chartLabels.push(result.name);
+                chartData.push(result.count);
+
                 const isWinner = index === 0;
                 const tr = document.createElement('tr');
                 tr.className = `border-b border-gray-800 ${isWinner ? 'bg-yellow-600/10' : 'hover:bg-gray-800/50'} transition-colors`;
@@ -352,13 +395,112 @@
                 `;
                 resultsTableBody.appendChild(tr);
             });
+
+            // 2. Render Chart
+            renderChart(chartLabels, chartData);
+        }
+
+        function renderChart(labels, data) {
+            const ctx = document.getElementById('voteChart').getContext('2d');
+            
+            // Destroy existing chart to prevent overlap
+            if (barChartInstance) {
+                barChartInstance.destroy();
+            }
+
+            barChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Votes',
+                        data: data,
+                        backgroundColor: 'rgba(202, 138, 4, 0.8)',
+                        borderColor: 'rgba(202, 138, 4, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            ticks: { color: '#9ca3af', stepSize: 1 },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        },
+                        x: { 
+                            ticks: { color: '#9ca3af' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
         }
 
         categoryFilter.addEventListener('change', (e) => {
             renderResults(e.target.value);
         });
 
-        document.getElementById('refresh-data-btn').addEventListener('click', fetchData);
+        // --- AUDIT SYSTEM (DELETE VOID VOTES) ---
+        function renderAuditTable(filterText = "") {
+            auditTableBody.innerHTML = '';
+            
+            const filteredVotes = allVotes.filter(vote => 
+                vote.matric && vote.matric.toLowerCase().includes(filterText.toLowerCase())
+            );
+
+            if (filteredVotes.length === 0) {
+                auditTableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">No records found.</td></tr>';
+                return;
+            }
+
+            // Sort by newest first
+            filteredVotes.sort((a, b) => b.timestamp.seconds - a.timestamp.seconds).forEach(vote => {
+                const date = new Date(vote.timestamp.seconds * 1000).toLocaleString();
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-gray-800 hover:bg-gray-800/30 transition-colors text-sm";
+                tr.innerHTML = `
+                    <td class="p-4 font-mono text-gray-300">${vote.matric}</td>
+                    <td class="p-4 text-gray-400">${vote.email || 'N/A'}</td>
+                    <td class="p-4 text-gray-500 text-xs">${date}</td>
+                    <td class="p-4 text-right">
+                        <button onclick="voidVote('${vote.docId}', '${vote.matric}')" class="bg-red-900/40 text-red-400 hover:bg-red-600 hover:text-white px-3 py-1 rounded border border-red-800/50 transition-colors font-bold text-xs uppercase tracking-wider shadow-sm">
+                            Void Vote
+                        </button>
+                    </td>
+                `;
+                auditTableBody.appendChild(tr);
+            });
+        }
+
+        searchAudit.addEventListener('input', (e) => renderAuditTable(e.target.value));
+
+        // Delete Logic attached to Window object so inline HTML can trigger it
+        window.voidVote = async function(docId, matric) {
+            if (confirm(`CRITICAL WARNING: Are you sure you want to permanently void the vote for Matric No. ${matric}?\n\nThis will remove their vote counts and allow them to vote again.`)) {
+                loadingOverlay.classList.remove('hidden');
+                try {
+                    // 1. Delete the vote document
+                    await deleteDoc(doc(db, "votes", docId));
+                    // 2. Delete the voter lock record so they can vote again if needed
+                    await deleteDoc(doc(db, "voters", matric));
+                    
+                    alert("Vote successfully voided and removed from database.");
+                    fetchData(); // Refresh all data and re-render
+                } catch (error) {
+                    console.error("Error voiding vote:", error);
+                    alert("Failed to void vote. Check your permissions and connection.");
+                    loadingOverlay.classList.add('hidden');
+                }
+            }
+        };
+
+        // Attach refresh triggers
+        document.querySelectorAll('.refresh-data-btn').forEach(btn => {
+            btn.addEventListener('click', fetchData);
+        });
 
     </script>
 </body>
