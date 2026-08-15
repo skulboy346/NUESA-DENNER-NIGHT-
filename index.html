@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Regency Gala - Voting Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-image: url('1999474.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-color: #000;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #ca8a04; border-radius: 10px; }
+        
+        /* Floating Animation for the Trophy */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); filter: drop-shadow(0 0 25px rgba(202, 138, 4, 0.9)); }
+            100% { transform: translateY(0px); }
+        }
+        .floating-award {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Energetic Pop-up Animation */
+        @keyframes popIn {
+            0% { transform: scale(0.8) translateY(30px); opacity: 0; }
+            80% { transform: scale(1.05) translateY(-5px); opacity: 1; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .animate-pop-in {
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Pulse Animation for the Submit Button */
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 10px rgba(202, 138, 4, 0.5); transform: scale(1); }
+            50% { box-shadow: 0 0 25px rgba(202, 138, 4, 1); transform: scale(1.02); }
+            100% { box-shadow: 0 0 10px rgba(202, 138, 4, 0.5); transform: scale(1); }
+        }
+        .btn-active-pulse {
+            animation: pulseGlow 2s infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white bg-black/85 bg-blend-overlay flex flex-col items-center relative overflow-x-hidden font-sans">
+
+    <!-- FLOATING ENERGETIC AWARD -->
+    <img src="https://cdn-icons-png.flaticon.com/512/3176/3176144.png" alt="Golden Award" class="floating-award fixed right-[-30px] md:right-[20px] top-[5%] md:top-[10%] w-32 md:w-56 lg:w-72 opacity-30 md:opacity-60 pointer-events-none z-0 sepia-[.5] hue-rotate-[-30deg] saturate-[2]">
+
+    <!-- MAIN VOTING SECTION -->
+    <div id="voting-section" class="w-full max-w-7xl px-4 md:px-8 z-10 pb-32 relative">
+        <!-- Header -->
+        <div class="text-center mb-8 mt-8 md:mt-12 bg-black/70 p-6 md:p-10 rounded-2xl border border-yellow-600/50 backdrop-blur-md shadow-2xl">
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-serif font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-700 tracking-wider drop-shadow-lg">THE REGENCY GALA</h1>
+            <p class="text-gray-200 mt-3 text-base md:text-xl font-medium tracking-widest uppercase">Official NUESA Voting Portal</p>
+            <div class="inline-block mt-4 px-6 py-2 bg-red-900/50 border border-red-500/50 rounded-full">
+                <p class="text-red-400 font-bold text-xs md:text-sm animate-pulse">⏳ VOTING CLOSES: AUGUST 28, 2026</p>
+            </div>
+        </div>
+
+        <!-- Categories Grid -->
+        <div id="categories-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            <!-- JavaScript will inject the 30 categories here -->
+        </div>
+
+        <!-- Progress Footer (Sticky) -->
+        <div class="fixed bottom-0 left-0 w-full p-4 md:p-6 bg-black/95 backdrop-blur-xl border-t-2 border-yellow-600 z-40 shadow-[0_-10px_30px_rgba(0,0,0,0.9)] flex flex-col md:flex-row items-center justify-between">
+            <div class="text-center md:text-left mb-3 md:mb-0 w-full md:w-auto">
+                <p class="text-gray-400 text-xs md:text-sm uppercase tracking-wider font-bold">Voting Progress</p>
+                <p id="vote-count-text" class="text-lg md:text-2xl text-yellow-500 font-black"><span id="count-number">0</span> / 30 Categories Selected</p>
+            </div>
+            <button id="proceed-btn" disabled class="w-full md:w-auto bg-gray-700 text-gray-400 font-bold py-3 md:py-4 px-8 md:px-12 rounded-xl disabled:opacity-70 transition-all duration-300 text-sm md:text-base uppercase tracking-widest">
+                COMPLETE ALL CATEGORIES
+            </button>
+        </div>
+    </div>
+
+    <!-- ENERGETIC AUTHENTICATION MODAL -->
+    <div id="auth-modal" class="fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center z-50 hidden p-4 md:p-0">
+        <div class="w-full max-w-lg bg-gradient-to-b from-gray-900 to-black p-6 md:p-10 rounded-3xl border-2 border-yellow-500 shadow-[0_0_50px_rgba(202,138,4,0.4)] relative animate-pop-in">
+            
+            <button id="close-modal-btn" class="absolute top-4 right-5 text-gray-500 hover:text-yellow-400 text-3xl transition-colors">&times;</button>
+            
+            <div class="text-center mb-8">
+                <span class="text-5xl md:text-6xl mb-3 block animate-bounce">🏆</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-600 font-serif uppercase tracking-wider leading-tight">Almost There!</h2>
+                <p class="text-gray-300 mt-2 font-medium text-sm md:text-base">Verify your student identity to officially lock in your votes.</p>
+            </div>
+            
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-xs md:text-sm font-bold mb-1 text-yellow-500/80 uppercase tracking-wider">Faculty Email</label>
+                    <input type="email" id="email-input" class="w-full p-4 bg-black/50 border-2 border-gray-700 rounded-xl text-white text-base md:text-lg focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/30 outline-none transition-all" required>
+                </div>
+                <div>
+                    <label class="block text-xs md:text-sm font-bold mb-1 text-yellow-500/80 uppercase tracking-wider">Matriculation Number</label>
+                    <input type="text" id="matric-input" placeholder="e.g. 0317" class="w-full p-4 bg-black/50 border-2 border-gray-700 rounded-xl text-white text-base md:text-lg focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/30 outline-none transition-all placeholder-gray-600" required>
+                </div>
+                
+                <div id="error-msg" class="hidden flex items-center justify-center space-x-2 bg-red-900/40 border border-red-500/50 p-3 rounded-lg">
+                    <span class="text-red-500 text-xl">⚠️</span>
+                    <p class="text-red-400 text-sm md:text-base font-medium text-center" id="error-text"></p>
+                </div>
+
+                <button id="final-submit-btn" class="w-full bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-600 text-black font-black text-lg md:text-xl py-4 rounded-xl mt-4 hover:shadow-[0_0_20px_rgba(202,138,4,0.6)] transition-all transform hover:-translate-y-1 active:translate-y-0">
+                    🔥 CAST MY VOTE!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE & LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAc51FKciWFcwuebOGX91it0NYHgOdbKdQ",
+            authDomain: "nuesa-dinner-night.firebaseapp.com",
+            projectId: "nuesa-dinner-night",
+            storageBucket: "nuesa-dinner-night.firebasestorage.app",
+            messagingSenderId: "544037485459",
+            appId: "1:544037485459:web:5d763d459910f30dad8666",
+            measurementId: "G-QNYDR43Z4Z"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Validation Rules
+        const VALID_CODES = ["0317", "0309", "0306", "0304", "0308", "0303", "0301", "0310", "0323", "0318", "0312", "0319", "0320", "0321", "0305", "0324", "0302", "0314"];
+        
+        const CATEGORIES = [
+            "Fresher of the Year (Male)", "Fresher of the Year (Female)", "Sophomore of the Year (Male)", "Sophomore of the Year (Female)", 
+            "Penultimate of the Year (Male)", "Penultimate of the Year (Female)", "Finalist of the Year (Male)", "Finalist of the Year (Female)", 
+            "Most Beautiful", "Most Handsome", "Most Fashionable (Male)", "Most Fashionable (Female)", 
+            "Most Politically Conscious (Year 1)", "Most Politically Conscious (Year 2)", "Most Politically Conscious (Year 3)", "Most Politically Conscious (Year 4)", 
+            "Scholar of the Year", "Sportsman of the Year", "Sportswoman of the Year", "Tech Wiz of the Year", 
+            "Most Influential (Year 1)", "Most Influential (Year 2)", "Most Influential (Year 3)", "Most Influential (Year 4)", 
+            "Brand of the Year", "Entrepreneur of the Year", "Clique of the Year", "Socialite of the Year (Male)", "Socialite of the Year (Female)", "NUESA EXCO of the Year"
+        ];
+
+        // Nominee Database
+        const NOMINEES = {
+            "Fresher of the Year (Male)": ["Soala", "Obi Osowoaken Lifted", "Akinola Emmanuel", "Elijah Egbayelo", "Emmagenius", "Adebisi Toheeb Adebayo", "Teeboi (Adult Education)", "Bristle", "Damilare", "Naza"],
+            "Fresher of the Year (Female)": ["Badaru Adijatu Kuburat", "Ajayi Olamide", "Okojie Jemimah", "Lawanson Oyenike Aishat", "Akoi Elizabeth Toluwalase", "Agu Njideka Sophia", "Sodunke Esther Omotolani", "Olatunde Blessing", "Sophie Alex", "Alloichus Daniella Chiamaka"],
+            "Sophomore of the Year (Male)": ["Opeyemi Maxwell", "Eletu Testimony", "Nwosu Emmanuel Chukwudi", "Efosa (Adult Education)", "Sojay", "Taiwo", "Ajiboye Titilope (Spade Z)", "Samuel Ashien", "Precious Owolabi", "Lawal Qoyum"],
+            "Sophomore of the Year (Female)": ["Ajiboye Titilope", "Ogunade Mojoyinoluwa", "Nkiruka Fortune", "Sophie", "Lauretta Aniebiet Animashaun", "Okoh Anthonia Ene", "Adedigba Grace", "Basira (Adult Education)", "Asika Chigozie", "Simsi (Divine Hasstrup)"],
+            "Penultimate of the Year (Male)": ["Adeniji Adebola", "Bolanle Bee", "Opara Joel", "Abdullahi Idris (Ajasco)", "Atidade Isaac", "James Ikechukwu", "Adeyinka Ganiu Adebayo (GAA)", "Captain", "Zektheotherguy", "Jubril Shuabi"],
+            "Penultimate of the Year (Female)": ["Iteoluwakinshi Said", "Makinwa Anjolaoluwa", "ENWERE-NWAYO ANGEL", "Mariam Abidoye", "Pelumi (Adult Education)", "Hi be kay", "Alebiosu Simbiat", "Fifi", "Happiness", "Queen ADE"],
+            "Finalist of the Year (Male)": ["Olanrewaju Azeez", "Micheal Peters", "Ayanleke AbdurRahman (IRAY)", "Ibitomi Victor Oluwashina", "Olabode Habeeb", "Enilolobo Daniel", "Ayeni Hussein", "Samuel Kolawole Joseph", "Ambassador", "Bundle"],
+            "Finalist of the Year (Female)": ["Makinde Ayomide Alice", "Valentina", "Islamiyah", "Okafor Favour Chidinma", "Adedayo Toyosi", "Elizabeth Oladele", "Ajide Mariam", "Toyosi Social Sec", "Owonikoko Eunice", "Matthew Ifeoma"],
+            "Most Beautiful": ["Onanogwu Taiwo Esther", "Jola", "Makinde Ayomide Alice", "Okojie Jemimah", "Simsi Haastrup", "Inah Precious Uke-ulim", "Akiyode Eunice", "Olasoji Moyinoluwa Victoria", "Anyanwu Josephine Chisom", "Alloichus Daniella Chiamaka"],
+            "Most Handsome": ["Kim", "Obi Osowoaken Lifted", "Akinola Emmanuel", "Opeyemi Maxwell", "Joel Chizaram", "Oluwadamilare Asenuga", "Emmagenius", "Ibitomi Victor", "Samuel Kolawole Joseph", "Olawale Quadri"],
+            "Most Fashionable (Male)": ["Olanrewaju Azeez", "Shodimu Oluwaseyi", "Joel Chizaram", "Opeyemi Maxwell", "Obi Osowoaken Lifted", "Adebisi Toheeb Adebayo", "Alloichus Daniella", "Jamaldeen Orisagbemi", "Ayo 200L", "Oludamilare Asenuga"],
+            "Most Fashionable (Female)": ["Davida Ogbeni", "Simsi Haastrup", "Valentina", "Makinde Ayomide Alice", "Oloyede Tolulope", "Abu Abieyuwa Anne", "Olatunde Blessing", "Lawanson Oyenike Aishat", "Okoh Anthonia Ene", "Tessacora"],
+            "Most Politically Conscious (Year 1)": ["Him", "Akinola Emmanuel", "Emmagenius", "Yusuff Maryam Arike", "Eloho", "Aloma Godwin", "Betty", "Sabby", "Irokosu Rahman", "Mehn"],
+            "Most Politically Conscious (Year 2)": ["Adebajo Serah", "Eletu Testimony", "Faith", "Oladejo Omolade Grace", "Raphael", "Efosa", "Eseomo", "Titi 200L", "Deborah", "Hale Sophie"],
+            "Most Politically Conscious (Year 3)": ["Joel Chizaram", "Abdullahi Idris (Ajasco)", "James Ikechukwu", "ENWERE-NWAYO ANGEL", "Adewuyi Azeemah", "Maggie", "Iteoluwakinshi", "Oluwatobiloba Obafemi", "Emmaunelllll", "Husseina Ibrahim"],
+            "Most Politically Conscious (Year 4)": ["Ibitomi Victor Oluwashina", "Micheal Peters", "Ayanleke AbdurRahman (IRAY)", "Ayeni Hussein", "SURD", "Oke Emmanuel (Connectplugz)", "Demilade HKHE", "Ambassador", "Ukadike Bright", "Agboola Michael (McCarthy Autos)"],
+            "Scholar of the Year": ["Valentina", "Nnamani Collins", "Abiodun Khadijah Ayomide", "Adeniji Adebola", "Oluku Jessica", "Rufai Fatimot Adedamola", "Nkiruka Fortune", "Shodipe Daniel", "Dansmart", "Fola Mariam"],
+            "Sportsman of the Year": ["Miracle Agwuncha", "Atidade Isaac", "Nathaniel Bassey (Nippull)", "Yusuf Qudus Temitope", "Aguncha Miracle", "Awelewa Ikeoluwa Ayomide", "Awelewa Ikeoluwa", "Peter Olumide", "Anih Joseph", "SANUSI ROTIMI"],
+            "Sportswoman of the Year": ["Moshood Suliat Omolara", "Kanyinsola", "Folusho", "Olatunji Basirat", "Ibe Chioma Mildred", "Basira", "Mary Year 2", "Hi be kay", "Anne", "Lauretta 200L"],
+            "Tech Wiz of the Year": ["ZekTheOtherGuy", "Emmanuel Ayandele", "Taiwo Gadget", "Opeyemi Maxwell", "Akinola Emmanuel", "Jidex", "Darasimi", "Makinde Ayomide Alice", "Bolanle (Bee)", "John"],
+            "Most Influential (Year 1)": ["Badaru Adijatu Kuburat", "Ugbem Uzo Alice", "Mitchel", "OSAREME MERCY IMAFIDON A.K.A OSAS", "Akinola Emmanuel", "Agu Njideka Sophia", "Udekogu Chidiogo Olivia", "Zak's", "Emmagenius", "Eloho"],
+            "Most Influential (Year 2)": ["Davida Ogbeni", "Ogunade Mojoyinoluwa", "Adebajo Serah", "Opeyemi Maxwell", "Sophie", "Osaro Efosa Elvis", "Efosa", "Nkiru", "Dorcas", "FAITH"],
+            "Most Influential (Year 3)": ["Iteoluwakinshi Said", "Bolanle Bee", "James Ikechukwu", "ENWERE-NWAYO ANGEL", "Abdullahi Idris (Ajasco)", "GAA", "Joel Chizaram", "Makinwa Anjolaoluwa", "Zion", "Fikayo"],
+            "Most Influential (Year 4)": ["Olanrewaju Azeez", "Micheal Peters", "Ibitomi Victor Oluwashina", "Makinde Ayomide Alice", "Olabode Habeeb", "Ayeni Hussein", "Valentina", "Elizabeth Oladele", "Bundle", "Oke Emmanuel (Connectplugz)"],
+            "Brand of the Year": ["Ugbem Uzo Alice", "TK Pastries", "Zak's", "Vintique Edge", "Midemode", "TIFE FASHION HOME", "FVVS Fashion", "Makinde Ayomide Alice", "DANSMART", "Dansmart Educational Consultant"],
+            "Entrepreneur of the Year": ["Onanogwu Taiwo Esther", "Lawal Taiwo Kausara", "Ibitomi Victor Oluwashina", "Abiodun Khadijah Ayomide", "Adewuyi Azeemah", "Makinde Ayomide Alice", "Micheal Peters", "Adejumo Favour Omoyeme", "Sodunke Esther Omotolani", "Matanmi Ifeoluwa"],
+            "Clique of the Year": ["THE BOYS", "Jadesola, Olamide, Alice", "Mojoyinoluwa and Dorcas", "Moyin and Eniola", "Tina and Princess", "ATE", "Enkay and Ese", "Sophie, Enny, Faith", "Ore and Dene (ADE)", "Precious Taiwo, Opeyemi and Ahliya"],
+            "Socialite of the Year (Male)": ["Bundle", "Obi Osowoaken Lifted", "Akinola Emmanuel", "Adebisi Toheeb Adebayo", "Delight", "Amor", "Opeyemi Maxwell", "Mehn", "Muoghalu Raphael", "OLUWABI DAMILOLA PETER"],
+            "Socialite of the Year (Female)": ["Badaru Adijatu Kuburat", "Simsi Haastrup", "Ogunade Mojoyinoluwa", "Iteoluwakinshi Said", "Makinde Ayomide Alice", "Elizabeth Oladele", "Afolabi Fiyinfoluwa Rachel", "Agu Njideka Sophia", "Adebajo Serah", "Anyanwu Josephine Chisom"],
+            "NUESA EXCO of the Year": ["AWONIYI SODIQ OPEYEMI ( Sport Secretary)", "JOEL CHIZARAM OPARA (President)", "Adewuyi Azeemah (Vice president)", "Adedayo Toyosi (Social Secretary)", "Adegbuyi Olumide Peter"]
+        };
+
+        let votes = {};
+
+        // DOM Elements
+        const categoriesGrid = document.getElementById('categories-grid');
+        const countNumber = document.getElementById('count-number');
+        const proceedBtn = document.getElementById('proceed-btn');
+        const authModal = document.getElementById('auth-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const finalSubmitBtn = document.getElementById('final-submit-btn');
+        const errorMsg = document.getElementById('error-msg');
+        const errorText = document.getElementById('error-text');
+
+        // Render Dropdowns for the 30 Categories
+        function renderCategories() {
+            CATEGORIES.forEach((cat, idx) => {
+                const nomineesList = NOMINEES[cat] || [];
+                
+                let optionsHTML = `<option value="" disabled selected>Tap to select...</option>`;
+                nomineesList.forEach(nominee => {
+                    optionsHTML += `<option value="${nominee}">${nominee}</option>`;
+                });
+
+                const card = document.createElement('div');
+                card.className = "border border-gray-800 p-4 md:p-5 rounded-xl bg-black/60 backdrop-blur-sm hover:border-yellow-500 hover:bg-black/80 transition-all duration-300 shadow-lg group";
+                card.innerHTML = `
+                    <div class="flex items-center mb-3">
+                        <span class="bg-yellow-600/20 text-yellow-500 font-bold w-6 h-6 md:w-8 md:h-8 flex items-center justify-center rounded-full mr-2 text-xs md:text-sm group-hover:bg-yellow-500 group-hover:text-black transition-colors">${idx + 1}</span>
+                        <h3 class="font-bold text-gray-200 text-sm md:text-base leading-tight">${cat}</h3>
+                    </div>
+                    <select class="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-white text-sm md:text-base focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 outline-none category-select shadow-inner cursor-pointer appearance-none" data-category="${cat}">
+                        ${optionsHTML}
+                    </select>
+                `;
+                categoriesGrid.appendChild(card);
+            });
+
+            // Listen for selections
+            document.querySelectorAll('.category-select').forEach(select => {
+                select.addEventListener('change', (e) => {
+                    const category = e.target.getAttribute('data-category');
+                    const value = e.target.value;
+                    
+                    if (value) {
+                        votes[category] = value;
+                        e.target.classList.add('border-yellow-500', 'bg-black');
+                    } else {
+                        delete votes[category];
+                        e.target.classList.remove('border-yellow-500', 'bg-black');
+                    }
+                    updateSubmitButton();
+                });
+            });
+        }
+
+        // Update the Progress Bar/Button
+        function updateSubmitButton() {
+            const currentVotes = Object.keys(votes).length;
+            countNumber.innerText = currentVotes;
+            
+            if (currentVotes === CATEGORIES.length) {
+                proceedBtn.disabled = false;
+                proceedBtn.innerText = "PROCEED TO SUBMIT 🚀";
+                proceedBtn.className = "w-full md:w-auto bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-black py-3 md:py-4 px-8 md:px-12 rounded-xl text-sm md:text-base uppercase tracking-widest btn-active-pulse hover:scale-105 transition-transform cursor-pointer";
+            } else {
+                proceedBtn.disabled = true;
+                proceedBtn.innerText = "COMPLETE ALL CATEGORIES";
+                proceedBtn.className = "w-full md:w-auto bg-gray-800 text-gray-500 font-bold py-3 md:py-4 px-8 md:px-12 rounded-xl text-sm md:text-base uppercase tracking-widest cursor-not-allowed";
+            }
+        }
+
+        // Open Modal
+        proceedBtn.addEventListener('click', () => {
+            authModal.classList.remove('hidden');
+        });
+
+        // Close Modal
+        closeModalBtn.addEventListener('click', () => {
+            authModal.classList.add('hidden');
+            errorMsg.classList.add('hidden');
+        });
+
+        // Final Validation & Firebase Submission
+        finalSubmitBtn.addEventListener('click', async () => {
+            const email = document.getElementById('email-input').value.trim();
+            const matric = document.getElementById('matric-input').value.trim();
+
+            if (!email || !matric) {
+                errorText.innerText = "Both fields are required.";
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            const hasValidCode = VALID_CODES.some(code => matric.includes(code));
+            if (!hasValidCode) {
+                errorText.innerText = "Invalid Student ID. Approved faculty code missing.";
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            finalSubmitBtn.innerHTML = '<span class="animate-pulse">Processing...</span>';
+            finalSubmitBtn.disabled = true;
+
+            try {
+                // 1. Check if user already voted
+                const voterRef = doc(db, 'voters', matric);
+                const voterSnap = await getDoc(voterRef);
+
+                if (voterSnap.exists()) {
+                    errorText.innerText = "Access Denied: This ID has already voted.";
+                    errorMsg.classList.remove('hidden');
+                    finalSubmitBtn.innerHTML = '🔥 CAST MY VOTE!';
+                    finalSubmitBtn.disabled = false;
+                    return;
+                }
+
+                // 2. Submit the Vote
+                const voteId = Date.now().toString();
+                await setDoc(doc(db, 'votes', voteId), {
+                    matric: matric,
+                    email: email,
+                    timestamp: new Date(),
+                    selections: votes
+                });
+
+                // 3. Mark user as voted to prevent duplicates
+                await setDoc(doc(db, 'voters', matric), { 
+                    votedAt: new Date(),
+                    email: email 
+                });
+
+                alert("🎉 SUCCESS! Your votes for The Regency Gala are locked in!");
+                window.location.reload();
+
+            } catch (error) {
+                errorText.innerText = "Connection failed. Check your internet.";
+                errorMsg.classList.remove('hidden');
+                finalSubmitBtn.innerHTML = '🔥 CAST MY VOTE!';
+                finalSubmitBtn.disabled = false;
+            }
+        });
+
+        // Initialize the page
+        renderCategories();
+
+    </script>
+</body>
+</html>
