@@ -6,7 +6,6 @@
     <title>Admin Dashboard - The Regency Gala</title>
     <link rel="icon" href="IMG-20260814-WA0019.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js Integration for Live Bar Charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { background-color: #0a0a0a; color: #fff; font-family: 'Inter', sans-serif; }
@@ -19,7 +18,6 @@
 </head>
 <body class="h-screen overflow-hidden flex">
 
-    <!-- ADMIN LOGIN MODAL -->
     <div id="admin-login" class="fixed inset-0 bg-black/95 flex items-center justify-center z-50 transition-opacity duration-500">
         <div class="bg-gray-900 p-8 rounded-2xl border border-yellow-600 shadow-[0_0_40px_rgba(202,138,4,0.3)] max-w-sm w-full mx-4 text-center">
             <div class="w-16 h-16 bg-yellow-600/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-yellow-500">
@@ -52,24 +50,23 @@
                 <span>🗑️</span> <span>Audit Votes</span>
             </button>
             <button class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors" data-target="categories">
-                <span>📂</span> <span>Categories (30)</span>
+                <span>📝</span> <span>Edit Nominees</span>
             </button>
             <button class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors" data-target="settings">
-                <span>⚙️</span> <span>System Settings</span>
+                <span>⚙️</span> <span>Settings</span>
             </button>
         </nav>
-
         <div class="p-4 border-t border-gray-800 text-center">
             <button id="logout-btn" class="text-gray-500 hover:text-red-400 text-sm font-medium transition-colors">🚪 Logout</button>
         </div>
     </aside>
 
-    <!-- MOBILE NAV (Bottom Bar) -->
+    <!-- MOBILE NAV -->
     <div class="md:hidden fixed bottom-0 w-full bg-gray-900 border-t border-gray-800 flex justify-around p-3 z-40 pb-6">
         <button class="nav-btn text-yellow-500 flex flex-col items-center" data-target="dashboard"><span class="text-xl">📊</span><span class="text-[10px]">Home</span></button>
         <button class="nav-btn text-gray-400 flex flex-col items-center" data-target="results"><span class="text-xl">📈</span><span class="text-[10px]">Results</span></button>
         <button class="nav-btn text-gray-400 flex flex-col items-center" data-target="audit"><span class="text-xl">🗑️</span><span class="text-[10px]">Audit</span></button>
-        <button class="nav-btn text-gray-400 flex flex-col items-center" data-target="settings"><span class="text-xl">⚙️</span><span class="text-[10px]">Settings</span></button>
+        <button class="nav-btn text-gray-400 flex flex-col items-center" data-target="categories"><span class="text-xl">📝</span><span class="text-[10px]">Edit</span></button>
     </div>
 
     <!-- MAIN CONTENT -->
@@ -92,7 +89,6 @@
                         🔄 Refresh Data
                     </button>
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-lg relative overflow-hidden">
                         <div class="absolute top-0 right-0 w-16 h-16 bg-yellow-600/10 rounded-bl-full"></div>
@@ -123,21 +119,15 @@
                         🔄 Sync
                     </button>
                 </div>
-
                 <div class="bg-gray-900 rounded-2xl border border-gray-800 p-6 shadow-lg mb-8">
                     <label class="block text-sm font-bold text-yellow-500 uppercase tracking-wider mb-2">Filter by Category</label>
                     <select id="category-filter" class="w-full bg-black border border-gray-700 text-white p-4 rounded-xl focus:border-yellow-500 outline-none">
                         <option value="" disabled selected>Select a category to view results...</option>
-                        <!-- Options injected by JS -->
                     </select>
                 </div>
-
-                <!-- LIVE BAR CHART CONTAINER -->
                 <div class="bg-gray-900 rounded-2xl border border-gray-800 p-6 shadow-lg mb-8 hidden" id="chart-container">
                     <canvas id="voteChart" height="100"></canvas>
                 </div>
-
-                <!-- RESULTS TABLE -->
                 <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow-lg">
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -148,9 +138,7 @@
                             </tr>
                         </thead>
                         <tbody id="results-table-body">
-                            <tr>
-                                <td colspan="3" class="p-8 text-center text-gray-500">Please select a category above.</td>
-                            </tr>
+                            <tr><td colspan="3" class="p-8 text-center text-gray-500">Please select a category above.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -167,7 +155,6 @@
                         🔄 Sync
                     </button>
                 </div>
-
                 <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow-lg">
                     <div class="p-4 bg-black/50 border-b border-gray-800">
                         <input type="text" id="search-audit" placeholder="Search by Matric Number..." class="w-full p-3 bg-black border border-gray-700 rounded-lg text-white focus:border-yellow-500 outline-none">
@@ -183,33 +170,38 @@
                                 </tr>
                             </thead>
                             <tbody id="audit-table-body">
-                                <tr>
-                                    <td colspan="4" class="p-8 text-center text-gray-500">Loading audit data...</td>
-                                </tr>
+                                <tr><td colspan="4" class="p-8 text-center text-gray-500">Loading audit data...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- VIEW 4: CATEGORIES & NOMINEES -->
+            <!-- VIEW 4: CATEGORIES & NOMINEES (EDIT SYSTEM) -->
             <div id="categories" class="tab-content">
-                <h1 class="text-3xl md:text-4xl font-serif text-white font-bold mb-2">Database Management</h1>
-                <p class="text-gray-400 mb-8">View the structured schema for the 30 active categories.</p>
+                <h1 class="text-3xl md:text-4xl font-serif text-white font-bold mb-2">Nominee Management (CMS)</h1>
+                <p class="text-gray-400 mb-6">Edit spelling errors dynamically. <span class="text-yellow-500 font-bold">NOTE: Changing names after voting starts will split their results in the chart.</span></p>
+                
+                <div class="bg-gray-900 rounded-2xl border border-gray-800 p-6 shadow-lg mb-8">
+                    <label class="block text-sm font-bold text-yellow-500 uppercase tracking-wider mb-2">Select Category to Edit</label>
+                    <select id="manage-category-filter" class="w-full bg-black border border-gray-700 text-white p-4 rounded-xl focus:border-yellow-500 outline-none">
+                        <option value="" disabled selected>Select a category...</option>
+                    </select>
+                </div>
+
                 <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow-lg">
-                    <div class="p-5 border-b border-gray-800 bg-black/30">
-                        <h2 class="font-bold text-yellow-500">Active Database Clusters (30/30)</h2>
-                    </div>
-                    <div class="p-6">
-                        <p class="text-sm text-gray-400 mb-4">Nominee data is integrated directly to ensure zero-latency loading on mobile networks.</p>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                            <div class="p-3 border border-gray-700 rounded bg-black text-gray-300">✓ Fresher of the Year (M/F)</div>
-                            <div class="p-3 border border-gray-700 rounded bg-black text-gray-300">✓ Sophomore of the Year (M/F)</div>
-                            <div class="p-3 border border-gray-700 rounded bg-black text-gray-300">✓ Penultimate of the Year (M/F)</div>
-                            <div class="p-3 border border-gray-700 rounded bg-black text-gray-300">✓ Finalist of the Year (M/F)</div>
-                            <div class="p-3 border border-gray-700 rounded bg-black text-gray-300 text-yellow-500/80">...and 22 additional categories locked.</div>
-                        </div>
-                    </div>
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-black/50 text-gray-400 text-xs uppercase tracking-wider">
+                                <th class="p-4 border-b border-gray-800 w-16 text-center">#</th>
+                                <th class="p-4 border-b border-gray-800">Nominee Name</th>
+                                <th class="p-4 border-b border-gray-800 w-32 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manage-nominees-body">
+                            <tr><td colspan="3" class="p-8 text-center text-gray-500">Please select a category above.</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -217,7 +209,6 @@
             <div id="settings" class="tab-content">
                 <h1 class="text-3xl md:text-4xl font-serif text-white font-bold mb-2">Security & Settings</h1>
                 <p class="text-gray-400 mb-8">System rules and validation configurations.</p>
-                
                 <div class="bg-gray-900 rounded-2xl border border-gray-800 p-6 shadow-lg mb-6">
                     <h2 class="text-xl text-white font-bold mb-4 border-b border-gray-800 pb-2">Authentication Rules</h2>
                     <div class="flex items-center justify-between py-3 border-b border-gray-800">
@@ -235,7 +226,7 @@
     <!-- FIREBASE & LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAc51FKciWFcwuebOGX91it0NYHgOdbKdQ",
@@ -250,9 +241,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // State Variables
         let allVotes = [];
         let barChartInstance = null;
+        
         const CATEGORIES = [
             "Fresher of the Year (Male)", "Fresher of the Year (Female)", "Sophomore of the Year (Male)", "Sophomore of the Year (Female)", 
             "Penultimate of the Year (Male)", "Penultimate of the Year (Female)", "Finalist of the Year (Male)", "Finalist of the Year (Female)", 
@@ -263,11 +254,62 @@
             "Brand of the Year", "Entrepreneur of the Year", "Clique of the Year", "Socialite of the Year (Male)", "Socialite of the Year (Female)", "NUESA EXCO of the Year"
         ];
 
-        // --- AUTHENTICATION LOGIC ---
+        let NOMINEES = {
+            "Fresher of the Year (Male)": ["Soala", "Obi Osowoaken Lifted", "Akinola Emmanuel", "Elijah Egbayelo", "Emmagenius", "Adebisi Toheeb Adebayo", "Teeboi (Adult Education)", "Bristle", "Damilare", "Naza"],
+            "Fresher of the Year (Female)": ["Badaru Adijatu Kuburat", "Ajayi Olamide", "Okojie Jemimah", "Lawanson Oyenike Aishat", "Akoi Elizabeth Toluwalase", "Agu Njideka Sophia", "Sodunke Esther Omotolani", "Olatunde Blessing", "Sophie Alex", "Alloichus Daniella Chiamaka"],
+            "Sophomore of the Year (Male)": ["Opeyemi Maxwell", "Eletu Testimony", "Nwosu Emmanuel Chukwudi", "Efosa (Adult Education)", "Sojay", "Taiwo", "Ajiboye Titilope (Spade Z)", "Samuel Ashien", "Precious Owolabi", "Lawal Qoyum"],
+            "Sophomore of the Year (Female)": ["Ajiboye Titilope", "Ogunade Mojoyinoluwa", "Nkiruka Fortune", "Sophie", "Lauretta Aniebiet Animashaun", "Okoh Anthonia Ene", "Adedigba Grace", "Basira (Adult Education)", "Asika Chigozie", "Simsi (Divine Hasstrup)"],
+            "Penultimate of the Year (Male)": ["Adeniji Adebola", "Bolanle Bee", "Opara Joel", "Abdullahi Idris (Ajasco)", "Atidade Isaac", "James Ikechukwu", "Adeyinka Ganiu Adebayo (GAA)", "Captain", "Zektheotherguy", "Jubril Shuabi"],
+            "Penultimate of the Year (Female)": ["Iteoluwakinshi Said", "Makinwa Anjolaoluwa", "ENWERE-NWAYO ANGEL", "Mariam Abidoye", "Pelumi (Adult Education)", "Hi be kay", "Alebiosu Simbiat", "Fifi", "Happiness", "Queen ADE"],
+            "Finalist of the Year (Male)": ["Olanrewaju Azeez", "Micheal Peters", "Ayanleke AbdurRahman (IRAY)", "Ibitomi Victor Oluwashina", "Olabode Habeeb", "Enilolobo Daniel", "Ayeni Hussein", "Samuel Kolawole Joseph", "Ambassador", "Bundle"],
+            "Finalist of the Year (Female)": ["Makinde Ayomide Alice", "Valentina", "Islamiyah", "Okafor Favour Chidinma", "Adedayo Toyosi", "Elizabeth Oladele", "Ajide Mariam", "Toyosi Social Sec", "Owonikoko Eunice", "Matthew Ifeoma"],
+            "Most Beautiful": ["Onanogwu Taiwo Esther", "Jola", "Makinde Ayomide Alice", "Okojie Jemimah", "Simsi Haastrup", "Inah Precious Uke-ulim", "Akiyode Eunice", "Olasoji Moyinoluwa Victoria", "Anyanwu Josephine Chisom", "Alloichus Daniella Chiamaka"],
+            "Most Handsome": ["Kim", "Obi Osowoaken Lifted", "Akinola Emmanuel", "Opeyemi Maxwell", "Joel Chizaram", "Oluwadamilare Asenuga", "Emmagenius", "Ibitomi Victor", "Samuel Kolawole Joseph", "Olawale Quadri"],
+            "Most Fashionable (Male)": ["Olanrewaju Azeez", "Shodimu Oluwaseyi", "Joel Chizaram", "Opeyemi Maxwell", "Obi Osowoaken Lifted", "Adebisi Toheeb Adebayo", "Alloichus Daniella", "Jamaldeen Orisagbemi", "Ayo 200L", "Oludamilare Asenuga"],
+            "Most Fashionable (Female)": ["Davida Ogbeni", "Simsi Haastrup", "Valentina", "Makinde Ayomide Alice", "Oloyede Tolulope", "Abu Abieyuwa Anne", "Olatunde Blessing", "Lawanson Oyenike Aishat", "Okoh Anthonia Ene", "Tessacora"],
+            "Most Politically Conscious (Year 1)": ["Him", "Akinola Emmanuel", "Emmagenius", "Yusuff Maryam Arike", "Eloho", "Aloma Godwin", "Betty", "Sabby", "Irokosu Rahman", "Mehn"],
+            "Most Politically Conscious (Year 2)": ["Adebajo Serah", "Eletu Testimony", "Faith", "Oladejo Omolade Grace", "Raphael", "Efosa", "Eseomo", "Titi 200L", "Deborah", "Hale Sophie"],
+            "Most Politically Conscious (Year 3)": ["Joel Chizaram", "Abdullahi Idris (Ajasco)", "James Ikechukwu", "ENWERE-NWAYO ANGEL", "Adewuyi Azeemah", "Maggie", "Iteoluwakinshi", "Oluwatobiloba Obafemi", "Emmaunelllll", "Husseina Ibrahim"],
+            "Most Politically Conscious (Year 4)": ["Ibitomi Victor Oluwashina", "Micheal Peters", "Ayanleke AbdurRahman (IRAY)", "Ayeni Hussein", "SURD", "Oke Emmanuel (Connectplugz)", "Demilade HKHE", "Ambassador", "Ukadike Bright", "Agboola Michael (McCarthy Autos)"],
+            "Scholar of the Year": ["Valentina", "Nnamani Collins", "Abiodun Khadijah Ayomide", "Adeniji Adebola", "Oluku Jessica", "Rufai Fatimot Adedamola", "Nkiruka Fortune", "Shodipe Daniel", "Dansmart", "Fola Mariam"],
+            "Sportsman of the Year": ["Miracle Agwuncha", "Atidade Isaac", "Nathaniel Bassey (Nippull)", "Yusuf Qudus Temitope", "Aguncha Miracle", "Awelewa Ikeoluwa Ayomide", "Awelewa Ikeoluwa", "Peter Olumide", "Anih Joseph", "SANUSI ROTIMI"],
+            "Sportswoman of the Year": ["Moshood Suliat Omolara", "Kanyinsola", "Folusho", "Olatunji Basirat", "Ibe Chioma Mildred", "Basira", "Mary Year 2", "Hi be kay", "Anne", "Lauretta 200L"],
+            "Tech Wiz of the Year": ["ZekTheOtherGuy", "Emmanuel Ayandele", "Taiwo Gadget", "Opeyemi Maxwell", "Akinola Emmanuel", "Jidex", "Darasimi", "Makinde Ayomide Alice", "Bolanle (Bee)", "John"],
+            "Most Influential (Year 1)": ["Badaru Adijatu Kuburat", "Ugbem Uzo Alice", "Mitchel", "OSAREME MERCY IMAFIDON A.K.A OSAS", "Akinola Emmanuel", "Agu Njideka Sophia", "Udekogu Chidiogo Olivia", "Zak's", "Emmagenius", "Eloho"],
+            "Most Influential (Year 2)": ["Davida Ogbeni", "Ogunade Mojoyinoluwa", "Adebajo Serah", "Opeyemi Maxwell", "Sophie", "Osaro Efosa Elvis", "Efosa", "Nkiru", "Dorcas", "FAITH"],
+            "Most Influential (Year 3)": ["Iteoluwakinshi Said", "Bolanle Bee", "James Ikechukwu", "ENWERE-NWAYO ANGEL", "Abdullahi Idris (Ajasco)", "GAA", "Joel Chizaram", "Makinwa Anjolaoluwa", "Zion", "Fikayo"],
+            "Most Influential (Year 4)": ["Olanrewaju Azeez", "Micheal Peters", "Ibitomi Victor Oluwashina", "Makinde Ayomide Alice", "Olabode Habeeb", "Ayeni Hussein", "Valentina", "Elizabeth Oladele", "Bundle", "Oke Emmanuel (Connectplugz)"],
+            "Brand of the Year": ["Ugbem Uzo Alice", "TK Pastries", "Zak's", "Vintique Edge", "Midemode", "TIFE FASHION HOME", "FVVS Fashion", "Makinde Ayomide Alice", "DANSMART", "Dansmart Educational Consultant"],
+            "Entrepreneur of the Year": ["Onanogwu Taiwo Esther", "Lawal Taiwo Kausara", "Ibitomi Victor Oluwashina", "Abiodun Khadijah Ayomide", "Adewuyi Azeemah", "Makinde Ayomide Alice", "Micheal Peters", "Adejumo Favour Omoyeme", "Sodunke Esther Omotolani", "Matanmi Ifeoluwa"],
+            "Clique of the Year": ["THE BOYS", "Jadesola, Olamide, Alice", "Mojoyinoluwa and Dorcas", "Moyin and Eniola", "Tina and Princess", "ATE", "Enkay and Ese", "Sophie, Enny, Faith", "Ore and Dene (ADE)", "Precious Taiwo, Opeyemi and Ahliya"],
+            "Socialite of the Year (Male)": ["Bundle", "Obi Osowoaken Lifted", "Akinola Emmanuel", "Adebisi Toheeb Adebayo", "Delight", "Amor", "Opeyemi Maxwell", "Mehn", "Muoghalu Raphael", "OLUWABI DAMILOLA PETER"],
+            "Socialite of the Year (Female)": ["Badaru Adijatu Kuburat", "Simsi Haastrup", "Ogunade Mojoyinoluwa", "Iteoluwakinshi Said", "Makinde Ayomide Alice", "Elizabeth Oladele", "Afolabi Fiyinfoluwa Rachel", "Agu Njideka Sophia", "Adebajo Serah", "Anyanwu Josephine Chisom"],
+            "NUESA EXCO of the Year": [
+                "AWONIYI SODIQ OPEYEMI (Sport Secretary)", 
+                "JOEL CHIZARAM OPARA (President)", 
+                "Adewuyi Azeemah (Vice president)", 
+                "Adedayo Toyosi (Social Secretary)", 
+                "IBITOMI VICTOR OLUWASHINA (Public Relations Officer)",
+                "Adegbuyi peter olumide (Welfare Secretary)",
+                "Adepoju Adefunmi Valentina (Gen Sec)",
+                "Enwere-Nwayo Angel (AGS)",
+                "Aderinale Zainab Temitope (Fin Sec)",
+                "Atanda Azeez (Treasurer)"
+            ]
+        };
+
         const loginScreen = document.getElementById('admin-login');
         const unlockBtn = document.getElementById('unlock-btn');
         const passwordInput = document.getElementById('admin-password');
         const errorMsg = document.getElementById('admin-error');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const categoryFilter = document.getElementById('category-filter');
+        const manageCategoryFilter = document.getElementById('manage-category-filter');
+        const resultsTableBody = document.getElementById('results-table-body');
+        const totalVotesStat = document.getElementById('total-votes-stat');
+        const auditTableBody = document.getElementById('audit-table-body');
+        const searchAudit = document.getElementById('search-audit');
+        const manageNomineesBody = document.getElementById('manage-nominees-body');
 
         unlockBtn.addEventListener('click', () => {
             if (passwordInput.value === "REFORM'25") {
@@ -279,10 +321,16 @@
             }
         });
 
-        // --- NAVIGATION LOGIC ---
+        // Setup Dropdowns
+        CATEGORIES.forEach(cat => {
+            const opt1 = document.createElement('option'); opt1.value = cat; opt1.innerText = cat;
+            const opt2 = document.createElement('option'); opt2.value = cat; opt2.innerText = cat;
+            categoryFilter.appendChild(opt1);
+            manageCategoryFilter.appendChild(opt2);
+        });
+
         const navBtns = document.querySelectorAll('.nav-btn');
         const tabContents = document.querySelectorAll('.tab-content');
-
         navBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 navBtns.forEach(b => {
@@ -290,7 +338,6 @@
                     b.classList.add('text-gray-400');
                     if (b.classList.contains('border')) b.classList.add('border-transparent');
                 });
-                
                 if(btn.classList.contains('w-full')){ 
                     btn.classList.remove('text-gray-400', 'border-transparent');
                     btn.classList.add('bg-yellow-600/10', 'text-yellow-500', 'border', 'border-yellow-500/50');
@@ -298,78 +345,64 @@
                     btn.classList.remove('text-gray-400');
                     btn.classList.add('text-yellow-500');
                 }
-
                 const target = btn.getAttribute('data-target');
                 tabContents.forEach(tab => tab.classList.remove('active'));
                 document.getElementById(target).classList.add('active');
             });
         });
 
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            window.location.reload();
-        });
+        document.getElementById('logout-btn').addEventListener('click', () => window.location.reload());
 
-        // --- DATABASE LOGIC ---
-        const loadingOverlay = document.getElementById('loading-overlay');
-        const categoryFilter = document.getElementById('category-filter');
-        const resultsTableBody = document.getElementById('results-table-body');
-        const totalVotesStat = document.getElementById('total-votes-stat');
-        const auditTableBody = document.getElementById('audit-table-body');
-        const searchAudit = document.getElementById('search-audit');
-
-        // Populate Category Dropdown
-        CATEGORIES.forEach(cat => {
-            const option = document.createElement('option');
-            option.value = cat;
-            option.innerText = cat;
-            categoryFilter.appendChild(option);
-        });
-
+        // --- FETCH DATA & OVERRIDES ---
         async function fetchData() {
             loadingOverlay.classList.remove('hidden');
             try {
+                // 1. Fetch Spelling Corrections first
+                const configSnap = await getDoc(doc(db, 'config', 'nominee_edits'));
+                if (configSnap.exists()) {
+                    const overrides = configSnap.data();
+                    for (const cat in overrides) {
+                        for (const idx in overrides[cat]) {
+                            NOMINEES[cat][idx] = overrides[cat][idx];
+                        }
+                    }
+                }
+
+                // 2. Fetch Votes
                 const querySnapshot = await getDocs(collection(db, "votes"));
                 allVotes = [];
                 querySnapshot.forEach((doc) => {
-                    // Store the document ID so we can delete it later
                     allVotes.push({ docId: doc.id, ...doc.data() });
                 });
                 
                 totalVotesStat.innerText = allVotes.length;
                 
-                if (categoryFilter.value) {
-                    renderResults(categoryFilter.value);
-                }
-                
+                if (categoryFilter.value) renderResults(categoryFilter.value);
+                if (manageCategoryFilter.value) renderManageCategory(manageCategoryFilter.value);
                 renderAuditTable();
 
             } catch (error) {
-                console.error("Error fetching data: ", error);
+                console.error(error);
                 alert("Failed to sync with Firebase. Check your network.");
             } finally {
                 loadingOverlay.classList.add('hidden');
             }
         }
 
-        // --- RENDER LIVE RESULTS & BAR CHART ---
+        // --- RENDER RESULTS & CHART ---
         function renderResults(categoryName) {
             document.getElementById('chart-container').classList.remove('hidden');
             const tallies = {};
             
-            // Count Votes
             allVotes.forEach(voteDoc => {
                 const selection = voteDoc.selections ? voteDoc.selections[categoryName] : null;
-                if (selection) {
-                    tallies[selection] = (tallies[selection] || 0) + 1;
-                }
+                if (selection) tallies[selection] = (tallies[selection] || 0) + 1;
             });
 
             const sortedResults = Object.keys(tallies).map(nominee => ({
-                name: nominee,
-                count: tallies[nominee]
+                name: nominee, count: tallies[nominee]
             })).sort((a, b) => b.count - a.count);
 
-            // 1. Render Table
             resultsTableBody.innerHTML = '';
             if (sortedResults.length === 0) {
                 resultsTableBody.innerHTML = '<tr><td colspan="3" class="p-8 text-center text-gray-500">No votes recorded for this category yet.</td></tr>';
@@ -377,14 +410,9 @@
                 return;
             }
 
-            const chartLabels = [];
-            const chartData = [];
-
+            const chartLabels = []; const chartData = [];
             sortedResults.forEach((result, index) => {
-                // Populate arrays for the chart
-                chartLabels.push(result.name);
-                chartData.push(result.count);
-
+                chartLabels.push(result.name); chartData.push(result.count);
                 const isWinner = index === 0;
                 const tr = document.createElement('tr');
                 tr.className = `border-b border-gray-800 ${isWinner ? 'bg-yellow-600/10' : 'hover:bg-gray-800/50'} transition-colors`;
@@ -395,68 +423,108 @@
                 `;
                 resultsTableBody.appendChild(tr);
             });
-
-            // 2. Render Chart
             renderChart(chartLabels, chartData);
         }
 
         function renderChart(labels, data) {
             const ctx = document.getElementById('voteChart').getContext('2d');
-            
-            // Destroy existing chart to prevent overlap
-            if (barChartInstance) {
-                barChartInstance.destroy();
-            }
-
+            if (barChartInstance) barChartInstance.destroy();
             barChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Total Votes',
-                        data: data,
-                        backgroundColor: 'rgba(202, 138, 4, 0.8)',
-                        borderColor: 'rgba(202, 138, 4, 1)',
-                        borderWidth: 1,
-                        borderRadius: 4
+                        label: 'Total Votes', data: data,
+                        backgroundColor: 'rgba(202, 138, 4, 0.8)', borderColor: 'rgba(202, 138, 4, 1)',
+                        borderWidth: 1, borderRadius: 4
                     }]
                 },
                 options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } },
+                    responsive: true, plugins: { legend: { display: false } },
                     scales: {
-                        y: { 
-                            beginAtZero: true, 
-                            ticks: { color: '#9ca3af', stepSize: 1 },
-                            grid: { color: 'rgba(255,255,255,0.05)' }
-                        },
-                        x: { 
-                            ticks: { color: '#9ca3af' },
-                            grid: { display: false }
-                        }
+                        y: { beginAtZero: true, ticks: { color: '#9ca3af', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { ticks: { color: '#9ca3af' }, grid: { display: false } }
                     }
                 }
             });
         }
 
-        categoryFilter.addEventListener('change', (e) => {
-            renderResults(e.target.value);
-        });
+        // --- CMS: EDIT NOMINEES ---
+        function renderManageCategory(categoryName) {
+            manageNomineesBody.innerHTML = '';
+            const nomineesList = NOMINEES[categoryName] || [];
+            
+            if(nomineesList.length === 0) {
+                manageNomineesBody.innerHTML = '<tr><td colspan="3" class="p-8 text-center text-gray-500">No nominees found.</td></tr>';
+                return;
+            }
 
-        // --- AUDIT SYSTEM (DELETE VOID VOTES) ---
+            nomineesList.forEach((nominee, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-gray-800 hover:bg-gray-800/30 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-4 text-center text-gray-400">${idx + 1}</td>
+                    <td class="p-4 text-white" id="nominee-text-${idx}">${nominee}</td>
+                    <td class="p-4 text-right">
+                        <button id="edit-btn-${idx}" onclick="editNominee('${categoryName}', ${idx})" class="text-blue-400 hover:text-white font-bold text-xs uppercase tracking-wider transition-colors">
+                            Edit
+                        </button>
+                    </td>
+                `;
+                manageNomineesBody.appendChild(tr);
+            });
+        }
+
+        window.editNominee = function(cat, idx) {
+            const td = document.getElementById(`nominee-text-${idx}`);
+            const currentName = td.innerText;
+            td.innerHTML = `<input type="text" id="edit-input-${idx}" class="w-full bg-black border border-yellow-500 text-white p-2 rounded outline-none focus:ring-1 focus:ring-yellow-500" value="${currentName}">`;
+            
+            const btn = document.getElementById(`edit-btn-${idx}`);
+            btn.innerText = "Save";
+            btn.className = "bg-green-900/50 text-green-400 hover:bg-green-500 hover:text-black px-3 py-1 rounded font-bold text-xs uppercase transition-colors";
+            btn.setAttribute("onclick", `saveNominee('${cat}', ${idx})`);
+        };
+
+        window.saveNominee = async function(cat, idx) {
+            const input = document.getElementById(`edit-input-${idx}`);
+            const newName = input.value.trim();
+            if (!newName) return alert("Nominee name cannot be empty.");
+
+            loadingOverlay.classList.remove('hidden');
+            try {
+                // Update Local Data
+                NOMINEES[cat][idx] = newName;
+                
+                // Update Firebase Config (Using dot notation to merge properly)
+                const docRef = doc(db, "config", "nominee_edits");
+                try {
+                    await updateDoc(docRef, { [`${cat}.${idx}`]: newName });
+                } catch (e) {
+                    // Create doc if it doesn't exist yet
+                    await setDoc(docRef, { [cat]: { [idx]: newName } }, { merge: true });
+                }
+
+                alert("Nominee corrected successfully! All live sites will update automatically.");
+                renderManageCategory(cat); 
+            } catch (error) {
+                console.error(error);
+                alert("Failed to save correction. Check network connection.");
+            } finally {
+                loadingOverlay.classList.add('hidden');
+            }
+        };
+
+        // --- AUDIT SYSTEM ---
         function renderAuditTable(filterText = "") {
             auditTableBody.innerHTML = '';
-            
-            const filteredVotes = allVotes.filter(vote => 
-                vote.matric && vote.matric.toLowerCase().includes(filterText.toLowerCase())
-            );
+            const filteredVotes = allVotes.filter(vote => vote.matric && vote.matric.toLowerCase().includes(filterText.toLowerCase()));
 
             if (filteredVotes.length === 0) {
                 auditTableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">No records found.</td></tr>';
                 return;
             }
 
-            // Sort by newest first
             filteredVotes.sort((a, b) => b.timestamp.seconds - a.timestamp.seconds).forEach(vote => {
                 const date = new Date(vote.timestamp.seconds * 1000).toLocaleString();
                 const tr = document.createElement('tr');
@@ -475,32 +543,27 @@
             });
         }
 
-        searchAudit.addEventListener('input', (e) => renderAuditTable(e.target.value));
-
-        // Delete Logic attached to Window object so inline HTML can trigger it
         window.voidVote = async function(docId, matric) {
-            if (confirm(`CRITICAL WARNING: Are you sure you want to permanently void the vote for Matric No. ${matric}?\n\nThis will remove their vote counts and allow them to vote again.`)) {
+            if (confirm(`CRITICAL WARNING: Are you sure you want to permanently void the vote for Matric No. ${matric}?`)) {
                 loadingOverlay.classList.remove('hidden');
                 try {
-                    // 1. Delete the vote document
                     await deleteDoc(doc(db, "votes", docId));
-                    // 2. Delete the voter lock record so they can vote again if needed
                     await deleteDoc(doc(db, "voters", matric));
-                    
                     alert("Vote successfully voided and removed from database.");
-                    fetchData(); // Refresh all data and re-render
+                    fetchData(); 
                 } catch (error) {
-                    console.error("Error voiding vote:", error);
-                    alert("Failed to void vote. Check your permissions and connection.");
+                    console.error("Error:", error);
+                    alert("Failed to void vote. Check your connection.");
                     loadingOverlay.classList.add('hidden');
                 }
             }
         };
 
-        // Attach refresh triggers
-        document.querySelectorAll('.refresh-data-btn').forEach(btn => {
-            btn.addEventListener('click', fetchData);
-        });
+        // Event Listeners
+        categoryFilter.addEventListener('change', (e) => renderResults(e.target.value));
+        manageCategoryFilter.addEventListener('change', (e) => renderManageCategory(e.target.value));
+        searchAudit.addEventListener('input', (e) => renderAuditTable(e.target.value));
+        document.querySelectorAll('.refresh-data-btn').forEach(btn => btn.addEventListener('click', fetchData));
 
     </script>
 </body>

@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The Regency Gala - Voting Portal</title>
-    <!-- Professional Browser Tab Icon using your image -->
     <link rel="icon" href="IMG-20260814-WA0019.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -48,12 +47,9 @@
 </head>
 <body class="min-h-screen text-white bg-black/60 flex flex-col items-center relative overflow-x-hidden font-sans">
 
-    <!-- FLOATING ELEMENT USING YOUR IMAGE -->
     <img src="IMG-20260814-WA0019.jpg" alt="Regency Gala Poster" class="floating-award fixed right-[-30px] md:right-[20px] top-[10%] md:top-[15%] w-32 md:w-56 lg:w-72 rounded-2xl shadow-[0_0_30px_rgba(202,138,4,0.6)] border-2 border-yellow-600 pointer-events-none z-0 opacity-50">
 
-    <!-- MAIN VOTING SECTION -->
     <div id="voting-section" class="w-full max-w-7xl px-4 md:px-8 z-10 pb-32 relative">
-        <!-- Header -->
         <div class="text-center mb-8 mt-8 md:mt-12 bg-black/70 p-6 md:p-10 rounded-2xl border border-yellow-600/50 backdrop-blur-md shadow-2xl">
             <h1 class="text-4xl md:text-6xl lg:text-7xl font-serif font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-700 tracking-wider drop-shadow-lg">THE REGENCY GALA</h1>
             <p class="text-gray-200 mt-3 text-base md:text-xl font-medium tracking-widest uppercase">Official NUESA Voting Portal</p>
@@ -62,12 +58,15 @@
             </div>
         </div>
 
-        <!-- Categories Grid -->
-        <div id="categories-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        <div id="loading-categories" class="text-center py-10">
+            <div class="w-10 h-10 border-4 border-yellow-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p class="text-yellow-500 font-bold tracking-widest animate-pulse">Loading Nominees...</p>
+        </div>
+
+        <div id="categories-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 hidden">
             <!-- JavaScript will inject the 30 categories here -->
         </div>
 
-        <!-- Progress Footer (Sticky) -->
         <div class="fixed bottom-0 left-0 w-full p-4 md:p-6 bg-black/95 backdrop-blur-xl border-t-2 border-yellow-600 z-40 shadow-[0_-10px_30px_rgba(0,0,0,0.9)] flex flex-col md:flex-row items-center justify-between">
             <div class="text-center md:text-left mb-3 md:mb-0 w-full md:w-auto">
                 <p class="text-gray-400 text-xs md:text-sm uppercase tracking-wider font-bold">Voting Progress</p>
@@ -79,18 +78,15 @@
         </div>
     </div>
 
-    <!-- ENERGETIC AUTHENTICATION MODAL -->
+    <!-- AUTHENTICATION MODAL -->
     <div id="auth-modal" class="fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center z-50 hidden p-4 md:p-0">
         <div class="w-full max-w-lg bg-gradient-to-b from-gray-900 to-black p-6 md:p-10 rounded-3xl border-2 border-yellow-500 shadow-[0_0_50px_rgba(202,138,4,0.4)] relative animate-pop-in">
-            
             <button id="close-modal-btn" class="absolute top-4 right-5 text-gray-500 hover:text-yellow-400 text-3xl transition-colors">&times;</button>
-            
             <div class="text-center mb-8">
                 <span class="text-5xl md:text-6xl mb-3 block animate-bounce">🏆</span>
                 <h2 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-600 font-serif uppercase tracking-wider leading-tight">Almost There!</h2>
                 <p class="text-gray-300 mt-2 font-medium text-sm md:text-base">Verify your student identity to officially lock in your votes.</p>
             </div>
-            
             <div class="space-y-5">
                 <div>
                     <label class="block text-xs md:text-sm font-bold mb-1 text-yellow-500/80 uppercase tracking-wider">Faculty Email</label>
@@ -100,12 +96,10 @@
                     <label class="block text-xs md:text-sm font-bold mb-1 text-yellow-500/80 uppercase tracking-wider">Matriculation Number</label>
                     <input type="text" id="matric-input" placeholder="e.g. 0317" class="w-full p-4 bg-black/50 border-2 border-gray-700 rounded-xl text-white text-base md:text-lg focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/30 outline-none transition-all placeholder-gray-600" required>
                 </div>
-                
                 <div id="error-msg" class="hidden flex items-center justify-center space-x-2 bg-red-900/40 border border-red-500/50 p-3 rounded-lg">
                     <span class="text-red-500 text-xl">⚠️</span>
                     <p class="text-red-400 text-sm md:text-base font-medium text-center" id="error-text"></p>
                 </div>
-
                 <button id="final-submit-btn" class="w-full bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-600 text-black font-black text-lg md:text-xl py-4 rounded-xl mt-4 hover:shadow-[0_0_20px_rgba(202,138,4,0.6)] transition-all transform hover:-translate-y-1 active:translate-y-0">
                     🔥 CAST MY VOTE!
                 </button>
@@ -143,7 +137,7 @@
             "Brand of the Year", "Entrepreneur of the Year", "Clique of the Year", "Socialite of the Year (Male)", "Socialite of the Year (Female)", "NUESA EXCO of the Year"
         ];
 
-        const NOMINEES = {
+        let NOMINEES = {
             "Fresher of the Year (Male)": ["Soala", "Obi Osowoaken Lifted", "Akinola Emmanuel", "Elijah Egbayelo", "Emmagenius", "Adebisi Toheeb Adebayo", "Teeboi (Adult Education)", "Bristle", "Damilare", "Naza"],
             "Fresher of the Year (Female)": ["Badaru Adijatu Kuburat", "Ajayi Olamide", "Okojie Jemimah", "Lawanson Oyenike Aishat", "Akoi Elizabeth Toluwalase", "Agu Njideka Sophia", "Sodunke Esther Omotolani", "Olatunde Blessing", "Sophie Alex", "Alloichus Daniella Chiamaka"],
             "Sophomore of the Year (Male)": ["Opeyemi Maxwell", "Eletu Testimony", "Nwosu Emmanuel Chukwudi", "Efosa (Adult Education)", "Sojay", "Taiwo", "Ajiboye Titilope (Spade Z)", "Samuel Ashien", "Precious Owolabi", "Lawal Qoyum"],
@@ -197,6 +191,28 @@
         const finalSubmitBtn = document.getElementById('final-submit-btn');
         const errorMsg = document.getElementById('error-msg');
         const errorText = document.getElementById('error-text');
+
+        // Fetch overrides before displaying categories
+        async function initializeAppWithOverrides() {
+            try {
+                const configRef = doc(db, 'config', 'nominee_edits');
+                const configSnap = await getDoc(configRef);
+                if (configSnap.exists()) {
+                    const overrides = configSnap.data();
+                    for (const cat in overrides) {
+                        for (const idx in overrides[cat]) {
+                            NOMINEES[cat][idx] = overrides[cat][idx];
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn("Could not check for overrides. Loading default database.", error);
+            }
+            
+            document.getElementById('loading-categories').classList.add('hidden');
+            categoriesGrid.classList.remove('hidden');
+            renderCategories();
+        }
 
         function renderCategories() {
             CATEGORIES.forEach((cat, idx) => {
@@ -318,7 +334,8 @@
             }
         });
 
-        renderCategories();
+        // Start App
+        initializeAppWithOverrides();
 
     </script>
 </body>
