@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - The Regency Gala</title>
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3176/3176144.png" type="image/png">
+    <!-- Professional Browser Tab Icon using your image -->
+    <link rel="icon" href="IMG-20260814-WA0019.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #0a0a0a; color: #fff; font-family: 'Inter', sans-serif; }
@@ -68,7 +69,6 @@
 
     <!-- MAIN CONTENT -->
     <main class="flex-1 bg-black overflow-y-auto relative pb-20 md:pb-0">
-        <!-- Overlay loading screen -->
         <div id="loading-overlay" class="absolute inset-0 bg-black/80 z-30 flex flex-col items-center justify-center hidden">
             <div class="w-12 h-12 border-4 border-yellow-600 border-t-transparent rounded-full animate-spin mb-4"></div>
             <p class="text-yellow-500 font-bold tracking-widest animate-pulse">SYNCING DATABASE...</p>
@@ -106,7 +106,6 @@
                     </div>
                 </div>
 
-                <!-- Recent Activity Table Mockup -->
                 <div class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow-lg">
                     <div class="p-5 border-b border-gray-800 flex justify-between items-center">
                         <h2 class="text-lg font-bold text-white">Recent Activity Log</h2>
@@ -230,7 +229,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // State Variables
         let allVotes = [];
         const CATEGORIES = [
             "Fresher of the Year (Male)", "Fresher of the Year (Female)", "Sophomore of the Year (Male)", "Sophomore of the Year (Female)", 
@@ -242,7 +240,6 @@
             "Brand of the Year", "Entrepreneur of the Year", "Clique of the Year", "Socialite of the Year (Male)", "Socialite of the Year (Female)", "NUESA EXCO of the Year"
         ];
 
-        // --- AUTHENTICATION LOGIC ---
         const loginScreen = document.getElementById('admin-login');
         const unlockBtn = document.getElementById('unlock-btn');
         const passwordInput = document.getElementById('admin-password');
@@ -252,36 +249,31 @@
             if (passwordInput.value === "REFORM'25") {
                 loginScreen.classList.add('opacity-0', 'pointer-events-none');
                 setTimeout(() => loginScreen.classList.add('hidden'), 500);
-                fetchData(); // Load data once logged in
+                fetchData();
             } else {
                 errorMsg.classList.remove('hidden');
             }
         });
 
-        // --- NAVIGATION LOGIC ---
         const navBtns = document.querySelectorAll('.nav-btn');
         const tabContents = document.querySelectorAll('.tab-content');
 
         navBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                // Reset styling
                 navBtns.forEach(b => {
                     b.classList.remove('bg-yellow-600/10', 'text-yellow-500', 'border-yellow-500/50');
                     b.classList.add('text-gray-400');
                     if (b.classList.contains('border')) b.classList.add('border-transparent');
                 });
                 
-                // Add active styling to clicked button (desktop logic)
                 if(btn.classList.contains('w-full')){ 
                     btn.classList.remove('text-gray-400', 'border-transparent');
                     btn.classList.add('bg-yellow-600/10', 'text-yellow-500', 'border', 'border-yellow-500/50');
                 } else {
-                    // Mobile logic
                     btn.classList.remove('text-gray-400');
                     btn.classList.add('text-yellow-500');
                 }
 
-                // Show correct tab
                 const target = btn.getAttribute('data-target');
                 tabContents.forEach(tab => tab.classList.remove('active'));
                 document.getElementById(target).classList.add('active');
@@ -292,13 +284,11 @@
             window.location.reload();
         });
 
-        // --- DATABASE LOGIC (LIVE RESULTS) ---
         const loadingOverlay = document.getElementById('loading-overlay');
         const categoryFilter = document.getElementById('category-filter');
         const resultsTableBody = document.getElementById('results-table-body');
         const totalVotesStat = document.getElementById('total-votes-stat');
 
-        // Populate Category Dropdown in Results Tab
         CATEGORIES.forEach(cat => {
             const option = document.createElement('option');
             option.value = cat;
@@ -315,10 +305,8 @@
                     allVotes.push(doc.data());
                 });
                 
-                // Update Dashboard Stat
                 totalVotesStat.innerText = allVotes.length;
                 
-                // If a category is already selected, re-render it
                 if (categoryFilter.value) {
                     renderResults(categoryFilter.value);
                 }
@@ -332,7 +320,6 @@
         }
 
         function renderResults(categoryName) {
-            // 1. Tally the votes for the selected category
             const tallies = {};
             
             allVotes.forEach(voteDoc => {
@@ -342,13 +329,11 @@
                 }
             });
 
-            // 2. Convert to array and sort by highest vote count
             const sortedResults = Object.keys(tallies).map(nominee => ({
                 name: nominee,
                 count: tallies[nominee]
             })).sort((a, b) => b.count - a.count);
 
-            // 3. Render HTML Table
             resultsTableBody.innerHTML = '';
             
             if (sortedResults.length === 0) {
@@ -357,7 +342,7 @@
             }
 
             sortedResults.forEach((result, index) => {
-                const isWinner = index === 0; // Highlight the person currently in 1st place
+                const isWinner = index === 0;
                 const tr = document.createElement('tr');
                 tr.className = `border-b border-gray-800 ${isWinner ? 'bg-yellow-600/10' : 'hover:bg-gray-800/50'} transition-colors`;
                 tr.innerHTML = `
@@ -369,12 +354,10 @@
             });
         }
 
-        // Listen for Dropdown Change
         categoryFilter.addEventListener('change', (e) => {
             renderResults(e.target.value);
         });
 
-        // Manual Refresh Button (Desktop)
         document.getElementById('refresh-data-btn').addEventListener('click', fetchData);
 
     </script>

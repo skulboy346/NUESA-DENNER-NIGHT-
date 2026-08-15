@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The Regency Gala - Voting Portal</title>
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3176/3176144.png" type="image/png">
+    <!-- Professional Browser Tab Icon using your image -->
+    <link rel="icon" href="IMG-20260814-WA0019.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -45,11 +46,10 @@
         }
     </style>
 </head>
-<!-- Adjusted background overlay to bg-black/60 for image visibility -->
 <body class="min-h-screen text-white bg-black/60 flex flex-col items-center relative overflow-x-hidden font-sans">
 
-    <!-- REPLACED BROKEN IMAGE WITH FAIL-PROOF GLOWING CSS GRAPHIC -->
-    <div class="floating-award fixed right-[-20px] md:right-[40px] top-[10%] md:top-[15%] text-8xl md:text-[15rem] pointer-events-none z-0 opacity-60 drop-shadow-[0_0_30px_rgba(202,138,4,0.9)]" style="filter: sepia(0.4) saturate(2.5) hue-rotate(-10deg);">🏆</div>
+    <!-- FLOATING ELEMENT USING YOUR IMAGE -->
+    <img src="IMG-20260814-WA0019.jpg" alt="Regency Gala Poster" class="floating-award fixed right-[-30px] md:right-[20px] top-[10%] md:top-[15%] w-32 md:w-56 lg:w-72 rounded-2xl shadow-[0_0_30px_rgba(202,138,4,0.6)] border-2 border-yellow-600 pointer-events-none z-0 opacity-50">
 
     <!-- MAIN VOTING SECTION -->
     <div id="voting-section" class="w-full max-w-7xl px-4 md:px-8 z-10 pb-32 relative">
@@ -131,7 +131,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Validation Rules
         const VALID_CODES = ["0317", "0309", "0306", "0304", "0308", "0303", "0301", "0310", "0323", "0318", "0312", "0319", "0320", "0321", "0305", "0324", "0302", "0314"];
         
         const CATEGORIES = [
@@ -144,7 +143,6 @@
             "Brand of the Year", "Entrepreneur of the Year", "Clique of the Year", "Socialite of the Year (Male)", "Socialite of the Year (Female)", "NUESA EXCO of the Year"
         ];
 
-        // Nominee Database
         const NOMINEES = {
             "Fresher of the Year (Male)": ["Soala", "Obi Osowoaken Lifted", "Akinola Emmanuel", "Elijah Egbayelo", "Emmagenius", "Adebisi Toheeb Adebayo", "Teeboi (Adult Education)", "Bristle", "Damilare", "Naza"],
             "Fresher of the Year (Female)": ["Badaru Adijatu Kuburat", "Ajayi Olamide", "Okojie Jemimah", "Lawanson Oyenike Aishat", "Akoi Elizabeth Toluwalase", "Agu Njideka Sophia", "Sodunke Esther Omotolani", "Olatunde Blessing", "Sophie Alex", "Alloichus Daniella Chiamaka"],
@@ -191,7 +189,6 @@
 
         let votes = {};
 
-        // DOM Elements
         const categoriesGrid = document.getElementById('categories-grid');
         const countNumber = document.getElementById('count-number');
         const proceedBtn = document.getElementById('proceed-btn');
@@ -201,7 +198,6 @@
         const errorMsg = document.getElementById('error-msg');
         const errorText = document.getElementById('error-text');
 
-        // Render Dropdowns for the 30 Categories
         function renderCategories() {
             CATEGORIES.forEach((cat, idx) => {
                 const nomineesList = NOMINEES[cat] || [];
@@ -225,7 +221,6 @@
                 categoriesGrid.appendChild(card);
             });
 
-            // Listen for selections
             document.querySelectorAll('.category-select').forEach(select => {
                 select.addEventListener('change', (e) => {
                     const category = e.target.getAttribute('data-category');
@@ -243,7 +238,6 @@
             });
         }
 
-        // Update the Progress Bar/Button
         function updateSubmitButton() {
             const currentVotes = Object.keys(votes).length;
             countNumber.innerText = currentVotes;
@@ -259,18 +253,15 @@
             }
         }
 
-        // Open Modal
         proceedBtn.addEventListener('click', () => {
             authModal.classList.remove('hidden');
         });
 
-        // Close Modal
         closeModalBtn.addEventListener('click', () => {
             authModal.classList.add('hidden');
             errorMsg.classList.add('hidden');
         });
 
-        // Final Validation & Firebase Submission
         finalSubmitBtn.addEventListener('click', async () => {
             const email = document.getElementById('email-input').value.trim();
             const matric = document.getElementById('matric-input').value.trim();
@@ -292,7 +283,6 @@
             finalSubmitBtn.disabled = true;
 
             try {
-                // 1. Check if user already voted
                 const voterRef = doc(db, 'voters', matric);
                 const voterSnap = await getDoc(voterRef);
 
@@ -304,7 +294,6 @@
                     return;
                 }
 
-                // 2. Submit the Vote
                 const voteId = Date.now().toString();
                 await setDoc(doc(db, 'votes', voteId), {
                     matric: matric,
@@ -313,7 +302,6 @@
                     selections: votes
                 });
 
-                // 3. Mark user as voted to prevent duplicates
                 await setDoc(doc(db, 'voters', matric), { 
                     votedAt: new Date(),
                     email: email 
@@ -330,7 +318,6 @@
             }
         });
 
-        // Initialize the page
         renderCategories();
 
     </script>
